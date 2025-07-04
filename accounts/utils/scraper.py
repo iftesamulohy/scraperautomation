@@ -53,7 +53,7 @@ def scrape_fbi_seeking_info():
             print(f"✔ {name}")
 
             if name and link and image:
-                ScrapedItem.objects.get_or_create(
+                ScrapedItem.objects.create(
                     name=name,
                     details_link=link,
                     image=image

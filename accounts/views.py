@@ -8,6 +8,41 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
 from accounts.utils.scraper import scrape_fbi_seeking_info  # updated import
 
+from django.utils.dateparse import parse_date
+from django.http import HttpResponse
+from django.template.loader import render_to_string
+from django.db.models import Q
+class ScrapedItemsListView(View):
+    def get(self, request):
+        # Get query params from htmx request
+        search = request.GET.get("search", "").strip()
+        start_date = request.GET.get("start_date")
+        end_date = request.GET.get("end_date")
+        show_duplicates = request.GET.get("show_duplicates") == "on"
+
+        qs = ScrapedItem.objects.all()
+
+        if search:
+            qs = qs.filter(name__icontains=search)
+
+        if start_date:
+            start_date_parsed = parse_date(start_date)
+            if start_date_parsed:
+                qs = qs.filter(scraped_at__date__gte=start_date_parsed)
+
+        if end_date:
+            end_date_parsed = parse_date(end_date)
+            if end_date_parsed:
+                qs = qs.filter(scraped_at__date__lte=end_date_parsed)
+
+        if not show_duplicates:
+            # show only one record per unique (name, details_link, image)
+            qs = qs.distinct("name", "details_link", "image")
+
+        qs = qs.order_by("-scraped_at")[:50]  # limit to last 50 for performance
+
+        html = render_to_string("partials/scraped_items_list.html", {"items": qs})
+        return HttpResponse(html)
 class RunScraperView(LoginRequiredMixin, View):
     def get(self, request):
         try:
