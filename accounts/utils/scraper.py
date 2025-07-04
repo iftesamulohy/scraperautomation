@@ -1,68 +1,65 @@
-import asyncio
+import cloudscraper
 from bs4 import BeautifulSoup
-from playwright.async_api import async_playwright, TimeoutError as PlaywrightTimeoutError
 from accounts.models import ScrapedItem
 
-async def scrape_fbi_seeking_info_playwright():
-    url = "https://www.fbi.gov/wanted/seeking-info"
+def scrape_fbi_seeking_info():
+    base_url = (
+        "https://www.fbi.gov/wanted/seeking-info/@@castle.cms.querylisting/querylisting-1"
+        "?display_type=wanted-grid"
+        "&sort_on=getObjPositionInParent"
+        "&missing_text=No+results+were+found."
+        "&limit=40"
+        "&query.i:records=path"
+        "&query.o:records=plone.app.querystring.operation.string.relativePath"
+        "&query.v:records=.%2F"
+        "&query.i:records=portal_type"
+        "&query.o:records=plone.app.querystring.operation.selection.any"
+        "&query.v:records=%5Bu%27Person%27%5D"
+        "&query.i:records=review_state"
+        "&query.o:records=plone.app.querystring.operation.selection.any"
+        "&query.v:records=%5Bu%27published%27%5D"
+        "&display_fields=%28%27image%27%2C%29"
+        "&page="
+    )
 
-    async with async_playwright() as p:
-        browser = await p.chromium.launch(headless=True)
-        page = await browser.new_page(
-            user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/118.0 Safari/537.36",
-            viewport={'width': 1280, 'height': 800}
-        )
-        await page.goto(url, timeout=60000)
+    scraper = cloudscraper.create_scraper()
+    page = 1
+    total = 0
 
-        # Optional: debug output
-        print("✅ Page loaded. Waiting for selector...")
+    while True:
+        url = base_url + str(page)
+        print(f"🔄 Scraping page {page}...")
 
-        try:
-            await page.wait_for_selector("ul.wanted-grid-natural", state='attached', timeout=60000)
-        except PlaywrightTimeoutError:
-            print("❌ Timed out: 'ul.wanted-grid-natural' not found.")
-            print(await page.content())  # for debugging
-            await browser.close()
-            return
+        res = scraper.get(url)
+        if res.status_code != 200:
+            print(f"❌ Failed to fetch page {page}")
+            break
 
-        # Scroll to bottom to trigger lazy loading
-        await page.evaluate("window.scrollTo(0, document.body.scrollHeight);")
-        await asyncio.sleep(3)  # wait for lazy content to load
+        soup = BeautifulSoup(res.text, "html.parser")
+        items = soup.find_all("li", class_="portal-type-person")
+        if not items:
+            print("✅ No more data.")
+            break
 
-        html = await page.content()
-        await browser.close()
+        for item in items:
+            name_tag = item.find("h3", class_="title")
+            a_tag = name_tag.find("a") if name_tag else None
+            name = a_tag.text.strip() if a_tag else ""
+            link = a_tag["href"] if a_tag and a_tag.has_attr("href") else ""
 
-    soup = BeautifulSoup(html, 'html.parser')
-    grid = soup.find('ul', class_='wanted-grid-natural')
-    if not grid:
-        print("❌ Grid not found even after JS rendering.")
-        return
+            img_tag = item.find("img")
+            image = img_tag.get("src") or img_tag.get("data-src") or "" if img_tag else ""
 
-    items = grid.find_all('li', class_='portal-type-person')
-    if not items:
-        print("❌ No wanted items found.")
-        return
+            print(f"✔ {name}")
 
-    for item in items:
-        name_tag = item.find('h3', class_='title')
-        if name_tag:
-            a_tag = name_tag.find('a')
-            name = a_tag.text.strip() if a_tag else ''
-            link = a_tag['href'] if a_tag and a_tag.has_attr('href') else ''
-        else:
-            name = ''
-            link = ''
+            if name and link and image:
+                ScrapedItem.objects.get_or_create(
+                    name=name,
+                    details_link=link,
+                    image=image
+                )
+                total += 1
 
-        img_tag = item.find('img')
-        image = ''
-        if img_tag:
-            image = img_tag.get('src') or img_tag.get('data-src') or img_tag.get('data-original') or ''
+        page += 1
 
-        print(f"Name: {name}\nLink: {link}\nImage: {image}\n{'-'*40}")
-
-        if name and link and image:
-            ScrapedItem.objects.get_or_create(
-                name=name,
-                details_link=link,
-                image=image
-            )
+    print(f"🎯 Total scraped: {total}")
