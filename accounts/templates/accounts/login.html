@@ -4,8 +4,8 @@
 <head>
     <meta charset="UTF-8">
     <title>Login</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/htmx.org@1.9.5"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <script src="https://cdn.jsdelivr.net/npm/htmx.org@2.0.6/dist/htmx.min.js" integrity="sha384-Akqfrbj/HpNVo8k11SXBb6TlBWmXXlYQrCSqEWmyKJe+hDm3Z/B2WVG4smwBkRVm" crossorigin="anonymous"></script>
     <script>
         // Toggle theme
         function toggleTheme() {
@@ -17,10 +17,12 @@
     <div class="max-w-md w-full p-8 rounded-xl bg-gray-100 dark:bg-gray-800 shadow-md">
         <h2 class="text-2xl font-bold text-center mb-4">Login</h2>
 
-        <div hx-get="{% url 'login_form' %}" hx-target="#form-area" hx-swap="innerHTML">
-            <div id="form-area" class="text-center">
-                Loading login form...
-            </div>
+        <div id="form-area" 
+            class="text-center" 
+            hx-get="{% url 'login_form' %}" 
+            hx-trigger="load" 
+            hx-swap="innerHTML">
+            Loading login form...
         </div>
 
         <button onclick="toggleTheme()" class="mt-6 w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700">
