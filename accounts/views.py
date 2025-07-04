@@ -6,6 +6,7 @@ from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
+from accounts.models import ScrapedItem
 from accounts.utils.scraper import scrape_fbi_seeking_info  # updated import
 
 from django.utils.dateparse import parse_date
