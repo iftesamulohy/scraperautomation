@@ -4,7 +4,9 @@ from django.shortcuts import redirect, render
 from django.http import HttpResponse
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
-
+from django.contrib.auth.mixins import LoginRequiredMixin
+class DashboardView(LoginRequiredMixin, TemplateView):
+    template_name = 'accounts/dashboard.html'
 
 class LoginPageView(TemplateView):
     template_name = 'accounts/login.html'
