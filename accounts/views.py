@@ -6,7 +6,9 @@ from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
-from .utils.scraper import scrape_fbi_seeking_info
+
+from accounts.utils.scraper import scrape_fbi_seeking_info
+
 class RunScraperView(View):
     def get(self, request):
         scrape_fbi_seeking_info()
