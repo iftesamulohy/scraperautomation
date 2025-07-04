@@ -1,34 +1,46 @@
 import asyncio
-from playwright.async_api import async_playwright
 from bs4 import BeautifulSoup
+from playwright.async_api import async_playwright, TimeoutError as PlaywrightTimeoutError
 from accounts.models import ScrapedItem
 
 async def scrape_fbi_seeking_info_playwright():
     url = "https://www.fbi.gov/wanted/seeking-info"
 
     async with async_playwright() as p:
-        browser = await p.chromium.launch(headless=True)  # headless browser
-        page = await browser.new_page()
-        await page.goto(url)
-        # Wait for the grid to load
-        await page.wait_for_selector('ul.wanted-grid-natural')
+        browser = await p.chromium.launch(headless=True)
+        page = await browser.new_page(
+            user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/118.0 Safari/537.36",
+            viewport={'width': 1280, 'height': 800}
+        )
+        await page.goto(url, timeout=60000)
 
-        # Scroll to bottom to trigger lazy loading if any
-        await page.evaluate("window.scrollTo(0, document.body.scrollHeight)")
-        await asyncio.sleep(3)  # wait for lazy loaded images/content
+        # Optional: debug output
+        print("✅ Page loaded. Waiting for selector...")
 
-        content = await page.content()
+        try:
+            await page.wait_for_selector("ul.wanted-grid-natural", state='attached', timeout=60000)
+        except PlaywrightTimeoutError:
+            print("❌ Timed out: 'ul.wanted-grid-natural' not found.")
+            print(await page.content())  # for debugging
+            await browser.close()
+            return
+
+        # Scroll to bottom to trigger lazy loading
+        await page.evaluate("window.scrollTo(0, document.body.scrollHeight);")
+        await asyncio.sleep(3)  # wait for lazy content to load
+
+        html = await page.content()
         await browser.close()
 
-    soup = BeautifulSoup(content, 'html.parser')
+    soup = BeautifulSoup(html, 'html.parser')
     grid = soup.find('ul', class_='wanted-grid-natural')
     if not grid:
-        print("Grid not found")
+        print("❌ Grid not found even after JS rendering.")
         return
 
     items = grid.find_all('li', class_='portal-type-person')
     if not items:
-        print("No wanted items found")
+        print("❌ No wanted items found.")
         return
 
     for item in items:
@@ -54,6 +66,3 @@ async def scrape_fbi_seeking_info_playwright():
                 details_link=link,
                 image=image
             )
-
-# Run the async function
-asyncio.run(scrape_fbi_seeking_info_playwright())

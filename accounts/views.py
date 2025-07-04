@@ -6,13 +6,16 @@ from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
+import asyncio
+import accounts.utils.scraper as scraper_utils
 
-from accounts.utils.scraper import scrape_fbi_seeking_info
-
-class RunScraperView(View):
+class RunScraperView(LoginRequiredMixin, View):
     def get(self, request):
-        scrape_fbi_seeking_info()
-        messages.success(request, "Scraping completed!")
+        try:
+            asyncio.run(scraper_utils.scrape_fbi_seeking_info_playwright())
+            messages.success(request, "✅ Scraping completed!")
+        except Exception as e:
+            messages.error(request, f"❌ Scraping failed: {str(e)}")
         return redirect('dashboard')
 class DashboardView(LoginRequiredMixin, TemplateView):
     template_name = 'accounts/dashboard.html'
