@@ -5,34 +5,16 @@
   <meta charset="UTF-8" />
   <title>Dashboard</title>
 
-  <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
-
-  <!-- HTMX -->
   <script src="https://unpkg.com/htmx.org@1.9.10"></script>
 
   <script>
-    const sunIcon = `
-      <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none"
-           viewBox="0 0 24 24" stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-              d="M12 3v2m0 14v2m9-9h-2M5 12H3m15.364-6.364l-1.414 1.414M7.05 17.95l-1.414 1.414M17.95 17.95l1.414-1.414M7.05 6.05L5.636 4.636M12 8a4 4 0 100 8 4 4 0 000-8z"/>
-      </svg>`;
-
-    const moonIcon = `
-      <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none"
-           viewBox="0 0 24 24" stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-              d="M21 12.79A9 9 0 0111.21 3 7 7 0 0012 21a9 9 0 009-8.21z"/>
-      </svg>`;
+    const sunIcon = `<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v2m0 14v2m9-9h-2M5 12H3m15.364-6.364l-1.414 1.414M7.05 17.95l-1.414 1.414M17.95 17.95l1.414-1.414M7.05 6.05L5.636 4.636M12 8a4 4 0 100 8 4 4 0 000-8z"/></svg>`;
+    const moonIcon = `<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12.79A9 9 0 0111.21 3 7 7 0 0012 21a9 9 0 009-8.21z"/></svg>`;
 
     function updateThemeIcon() {
       const icon = document.getElementById('theme-icon');
-      if (document.documentElement.classList.contains('dark')) {
-        icon.innerHTML = sunIcon;
-      } else {
-        icon.innerHTML = moonIcon;
-      }
+      icon.innerHTML = document.documentElement.classList.contains('dark') ? sunIcon : moonIcon;
     }
 
     function toggleTheme() {
@@ -43,18 +25,19 @@
 
     document.addEventListener('DOMContentLoaded', () => {
       const savedTheme = localStorage.getItem('theme');
-      if (savedTheme === 'dark') {
-        document.documentElement.classList.add('dark');
-      } else {
-        document.documentElement.classList.remove('dark');
-      }
+      document.documentElement.classList.toggle('dark', savedTheme === 'dark');
       updateThemeIcon();
+
+      // Default today
+      const today = new Date().toISOString().split('T')[0];
+      document.getElementById('start_date').value = today;
+      document.getElementById('end_date').value = today;
     });
   </script>
 </head>
 <body class="flex min-h-screen bg-white text-gray-900 dark:bg-gray-900 dark:text-gray-100 transition-colors duration-300">
 
-  <!-- Theme Toggle Button (Top-right corner) -->
+  <!-- Toggle Theme Button -->
   <button onclick="toggleTheme()" aria-label="Toggle dark mode"
           class="fixed top-4 right-4 z-50 p-2 bg-gray-200 dark:bg-gray-700 rounded-full text-gray-800 dark:text-white hover:shadow-md transition-colors duration-300">
     <span id="theme-icon"></span>
@@ -69,13 +52,8 @@
       </nav>
     </div>
     <div>
-      <a href="{% url 'run_scraper' %}" class="inline-block bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 mb-4 w-full text-center">
-        Run Scraper
-      </a>
-      <a href="{% url 'logout' %}"
-         class="block w-full bg-red-600 text-white py-2 rounded text-center hover:bg-red-700 transition-colors">
-        Logout
-      </a>
+      <a href="{% url 'run_scraper' %}" class="inline-block bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 mb-4 w-full text-center">Run Scraper</a>
+      <a href="{% url 'logout' %}" class="block w-full bg-red-600 text-white py-2 rounded text-center hover:bg-red-700 transition-colors">Logout</a>
     </div>
   </aside>
 
@@ -83,22 +61,16 @@
   <main class="flex-1 p-10 bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
 
     <h1 class="text-3xl font-bold mb-6">Welcome, {{ request.user.username }}!</h1>
-    <p class="mb-6">This is your dashboard with HTMX and a working dark theme toggle.</p>
 
-    <!-- Search & Filters Form -->
-    <form id="search-form" 
-          hx-get="{% url 'scraped_items_list' %}" 
-          hx-target="#results" 
-          hx-trigger="keyup changed delay:500ms, change"
-          class="mb-6 space-y-4 max-w-3xl">
+    <!-- Filter Form -->
+    <form id="search-form"
+          hx-get="{% url 'scraped_items_list' %}"
+          hx-target="#results-container"
+          hx-trigger="change, keyup delay:400ms from:input"
+          hx-include="#search-form"
+          class="mb-6 space-y-4 max-w-4xl">
 
-      <input
-        type="text"
-        name="search"
-        placeholder="Search by name..."
-        class="w-full px-4 py-2 border rounded dark:bg-gray-800 dark:border-gray-700"
-        autocomplete="off"
-      />
+      <input type="text" name="search" placeholder="Search by name..." class="w-full px-4 py-2 border rounded dark:bg-gray-800 dark:border-gray-700" />
 
       <div class="flex space-x-4">
         <div>
@@ -112,18 +84,20 @@
       </div>
 
       <label class="inline-flex items-center space-x-2">
-        <input type="checkbox" name="show_duplicates" class="rounded" />
+        <input type="checkbox" name="show_duplicates" class="rounded" checked />
         <span>Show duplicate data</span>
-      </label>
-
+    </label>
     </form>
 
-    <!-- Results Container -->
-    <div id="results" class="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-6xl">
-      {% comment %} HTMX will inject data here {% endcomment %}
+    <!-- Results Grid -->
+    <div id="results-container"
+         class="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-6xl"
+         hx-get="{% url 'scraped_items_list' %}?page=1"
+         hx-trigger="load"
+         hx-target="this"
+         hx-swap="innerHTML">
     </div>
 
   </main>
-
 </body>
 </html>

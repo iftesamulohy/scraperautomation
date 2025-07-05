@@ -13,13 +13,33 @@ from django.utils.dateparse import parse_date
 from django.http import HttpResponse
 from django.template.loader import render_to_string
 from django.db.models import Q
+from datetime import timedelta
+
+
+class DetectChangesView(View):
+    def get(self, request):
+        # Compare today vs. yesterday
+        now = timezone.now()
+        yesterday = now - timedelta(days=1)
+
+        # Items added in the last 24h
+        new_items = ScrapedItem.objects.filter(timestamp__gte=yesterday).order_by('-timestamp')
+
+        html = render_to_string("accounts/partials/detect_changes_modal.html", {
+            "new_items": new_items,
+            "checked_at": now,
+        })
+
+        return HttpResponse(html)
+
 class ScrapedItemsListView(View):
     def get(self, request):
-        # Get query params from htmx request
         search = request.GET.get("search", "").strip()
         start_date = request.GET.get("start_date")
         end_date = request.GET.get("end_date")
-        show_duplicates = request.GET.get("show_duplicates") == "on"
+        show_duplicates = request.GET.get("show_duplicates", "on") == "on"
+        page = int(request.GET.get("page", 1))
+        page_size = 20
 
         qs = ScrapedItem.objects.all()
 
@@ -29,20 +49,34 @@ class ScrapedItemsListView(View):
         if start_date:
             start_date_parsed = parse_date(start_date)
             if start_date_parsed:
-                qs = qs.filter(scraped_at__date__gte=start_date_parsed)
+                qs = qs.filter(timestamp__date__gte=start_date_parsed)
 
         if end_date:
             end_date_parsed = parse_date(end_date)
             if end_date_parsed:
-                qs = qs.filter(scraped_at__date__lte=end_date_parsed)
+                qs = qs.filter(timestamp__date__lte=end_date_parsed)
+
+        qs = qs.order_by("-timestamp")
 
         if not show_duplicates:
-            # show only one record per unique (name, details_link, image)
-            qs = qs.distinct("name", "details_link", "image")
+            seen_names = set()
+            unique_items = []
+            for item in qs:
+                if item.name not in seen_names:
+                    seen_names.add(item.name)
+                    unique_items.append(item)
+            qs = unique_items  # This is now a list
+        else:
+            qs = list(qs)  # Convert queryset to list
 
-        qs = qs.order_by("-scraped_at")[:50]  # limit to last 50 for performance
+        start = (page - 1) * page_size
+        end = start + page_size
+        paginated_items = qs[start:end]
 
-        html = render_to_string("partials/scraped_items_list.html", {"items": qs})
+        html = render_to_string(
+            "accounts/partials/scraped_items_list.html",
+            {"items": paginated_items, "page": page}
+        )
         return HttpResponse(html)
 class RunScraperView(LoginRequiredMixin, View):
     def get(self, request):
