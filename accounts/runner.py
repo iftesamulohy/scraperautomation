@@ -1,8 +1,7 @@
 import schedule
 import time
 import threading
-from datetime import datetime
-from django.utils.timezone import now
+from django.utils.timezone import now, localtime
 from .models import ScraperSchedule
 from accounts.utils.scraper import scrape_fbi_seeking_info
 
@@ -13,8 +12,9 @@ def run_scraper():
 def scheduler_loop():
     def job():
         config = ScraperSchedule.get_solo()
-        now_time = now().time()
+        now_time = localtime(now()).time()  # Convert to local time per settings.TIME_ZONE
 
+        # Compare local times (hour and minute)
         if config.run_time.hour == now_time.hour and config.run_time.minute == now_time.minute:
             run_scraper()
 
