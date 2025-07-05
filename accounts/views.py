@@ -87,26 +87,18 @@ class DetectChangesView(View):
 class ScrapedItemsListView(View):
     def get(self, request):
         search = request.GET.get("search", "").strip()
-        start_date = request.GET.get("start_date")
-        end_date = request.GET.get("end_date")
+        token_id = request.GET.get("token")
         show_duplicates = request.GET.get("show_duplicates", "on") == "on"
         page = int(request.GET.get("page", 1))
         page_size = 20
 
         qs = ScrapedItem.objects.all()
 
+        if token_id:
+            qs = qs.filter(token__id=token_id)
+
         if search:
             qs = qs.filter(name__icontains=search)
-
-        if start_date:
-            start_date_parsed = parse_date(start_date)
-            if start_date_parsed:
-                qs = qs.filter(timestamp__date__gte=start_date_parsed)
-
-        if end_date:
-            end_date_parsed = parse_date(end_date)
-            if end_date_parsed:
-                qs = qs.filter(timestamp__date__lte=end_date_parsed)
 
         qs = qs.order_by("-timestamp")
 
@@ -117,9 +109,9 @@ class ScrapedItemsListView(View):
                 if item.name not in seen_names:
                     seen_names.add(item.name)
                     unique_items.append(item)
-            qs = unique_items  # This is now a list
+            qs = unique_items  # Now it's a list
         else:
-            qs = list(qs)  # Convert queryset to list
+            qs = list(qs)
 
         start = (page - 1) * page_size
         end = start + page_size
@@ -140,6 +132,12 @@ class RunScraperView(LoginRequiredMixin, View):
         return redirect("dashboard")
 class DashboardView(LoginRequiredMixin, TemplateView):
     template_name = 'accounts/dashboard.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["tokens"] = Token.objects.order_by("-created_at")[:50]
+        context["selected_token"] = self.request.GET.get("token", "")
+        return context
 
 class LoginPageView(TemplateView):
     template_name = 'accounts/login.html'
