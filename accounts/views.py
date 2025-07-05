@@ -14,19 +14,39 @@ from django.http import HttpResponse
 from django.template.loader import render_to_string
 from django.db.models import Q
 from datetime import timedelta
-
+from django.utils import timezone
+from django.db.models import Max, Q
 
 class DetectChangesView(View):
     def get(self, request):
-        # Compare today vs. yesterday
         now = timezone.now()
         yesterday = now - timedelta(days=1)
 
-        # Items added in the last 24h
-        new_items = ScrapedItem.objects.filter(timestamp__gte=yesterday).order_by('-timestamp')
+        # Filter items updated or omitted in last 24h
+        recent_items = ScrapedItem.objects.filter(timestamp__gte=yesterday)
+
+        # If you have a boolean field like 'is_omitted', include that:
+        # recent_items = ScrapedItem.objects.filter(
+        #     Q(timestamp__gte=yesterday) | Q(is_omitted=True)
+        # )
+
+        # Group by 'name' and get max timestamp per name
+        latest_per_name = recent_items.values('name').annotate(
+            max_timestamp=Max('timestamp')
+        )
+
+        # Collect the latest updated item for each unique name
+        unique_latest_items = []
+        for entry in latest_per_name:
+            item = ScrapedItem.objects.filter(
+                name=entry['name'],
+                timestamp=entry['max_timestamp']
+            ).first()
+            if item:
+                unique_latest_items.append(item)
 
         html = render_to_string("accounts/partials/detect_changes_modal.html", {
-            "new_items": new_items,
+            "new_items": unique_latest_items,
             "checked_at": now,
         })
 

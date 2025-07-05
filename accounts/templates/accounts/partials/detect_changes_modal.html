@@ -1,25 +1,25 @@
-<div class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-  <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 w-full max-w-2xl relative">
-    <h2 class="text-xl font-bold mb-4 text-center">📌 Newly Added Items (Last 24h)</h2>
+<div class="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50">
+  <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg w-full max-w-3xl max-h-[90vh] overflow-y-auto relative p-6">
+    <h2 class="text-xl font-bold text-center mb-4">📌 New Items (Last 24h)</h2>
 
     <button onclick="document.getElementById('modal-container').innerHTML=''"
-            class="absolute top-2 right-2 text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white text-xl">
+            class="absolute top-2 right-3 text-2xl text-gray-700 dark:text-gray-300 hover:text-black dark:hover:text-white">
       &times;
     </button>
 
     {% if new_items %}
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
         {% for item in new_items %}
           <div class="bg-white dark:bg-gray-700 p-4 rounded shadow">
             <img src="{{ item.image }}" alt="{{ item.name }}" class="w-full h-32 object-cover rounded mb-2">
             <h3 class="font-semibold">{{ item.name }}</h3>
             <p class="text-sm text-gray-500">{{ item.timestamp|date:"Y-m-d H:i" }}</p>
-            <a href="{{ item.details_link }}" class="text-blue-600 dark:text-blue-400 text-sm" target="_blank">Details</a>
+            <a href="{{ item.details_link }}" target="_blank" class="text-blue-600 dark:text-blue-400 text-sm">Details</a>
           </div>
         {% endfor %}
       </div>
     {% else %}
-      <p class="text-center text-gray-500">No new items detected in the last 24 hours.</p>
+      <p class="text-center text-gray-500">No new items found in the last 24 hours.</p>
     {% endif %}
   </div>
 </div>

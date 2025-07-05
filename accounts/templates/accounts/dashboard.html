@@ -61,16 +61,26 @@
 
     <h1 class="text-3xl font-bold mb-6">Welcome, {{ request.user.username }}!</h1>
 
-    <!-- Detect Changes Button -->
-    <div class="mb-4">
+    <!-- Buttons Row: Detect Changes + Run Scraper + Logout -->
+    <div class="mb-4 flex space-x-4">
       <button
         hx-get="{% url 'detect_changes' %}"
         hx-target="#modal-container"
         hx-trigger="click"
         hx-swap="innerHTML"
-        class="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded">
+        class="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded whitespace-nowrap">
         Detect Changes
       </button>
+
+      <a href="{% url 'run_scraper' %}" 
+         class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded whitespace-nowrap flex items-center justify-center">
+        Run Scraper
+      </a>
+
+      <a href="{% url 'logout' %}" 
+         class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded whitespace-nowrap flex items-center justify-center">
+        Logout
+      </a>
     </div>
 
     <!-- Filter Form -->
