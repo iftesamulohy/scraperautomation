@@ -16,42 +16,54 @@ from django.db.models import Q
 from datetime import timedelta
 from django.utils import timezone
 from django.db.models import Max, Q
-
+from django.utils.timezone import make_aware, is_naive, now as timezone_now
+from django.utils.dateparse import parse_datetime
 class DetectChangesView(View):
     def get(self, request):
-        now = timezone.now()
-        yesterday = now - timedelta(days=1)
+        now = timezone_now()
 
-        # Filter items updated or omitted in last 24h
-        recent_items = ScrapedItem.objects.filter(timestamp__gte=yesterday)
+        # Get optional datetime strings from request
+        start_str = request.GET.get('start')
+        end_str = request.GET.get('end')
 
-        # If you have a boolean field like 'is_omitted', include that:
-        # recent_items = ScrapedItem.objects.filter(
-        #     Q(timestamp__gte=yesterday) | Q(is_omitted=True)
-        # )
+        # Fallback defaults: today and yesterday
+        today_start = now.replace(hour=0, minute=0, second=0, microsecond=0)
+        start_time = parse_datetime(start_str) if start_str else today_start
+        end_time = parse_datetime(end_str) if end_str else now
 
-        # Group by 'name' and get max timestamp per name
-        latest_per_name = recent_items.values('name').annotate(
-            max_timestamp=Max('timestamp')
-        )
+        # Ensure timezone-aware
+        if is_naive(start_time):
+            start_time = make_aware(start_time)
+        if is_naive(end_time):
+            end_time = make_aware(end_time)
 
-        # Collect the latest updated item for each unique name
-        unique_latest_items = []
-        for entry in latest_per_name:
-            item = ScrapedItem.objects.filter(
-                name=entry['name'],
-                timestamp=entry['max_timestamp']
-            ).first()
-            if item:
-                unique_latest_items.append(item)
+        # Calculate "previous range" of same duration
+        duration = end_time - start_time
+        prev_start = start_time - duration
+        prev_end = start_time
 
+        # Query previous and current range
+        prev_items = ScrapedItem.objects.filter(timestamp__gte=prev_start, timestamp__lt=prev_end)
+        current_items = ScrapedItem.objects.filter(timestamp__gte=start_time, timestamp__lte=end_time)
+
+        prev_names = set(prev_items.values_list('name', flat=True))
+        current_names = set(current_items.values_list('name', flat=True))
+
+        # Detect changes
+        newly_added_names = current_names - prev_names
+        omitted_names = prev_names - current_names
+
+        newly_added_items = current_items.filter(name__in=newly_added_names)
+        omitted_items = prev_items.filter(name__in=omitted_names)
+
+        # Render modal
         html = render_to_string("accounts/partials/detect_changes_modal.html", {
-            "new_items": unique_latest_items,
+            "newly_added_items": newly_added_items,
+            "omitted_items": omitted_items,
             "checked_at": now,
-        })
+        }, request=request)
 
         return HttpResponse(html)
-
 class ScrapedItemsListView(View):
     def get(self, request):
         search = request.GET.get("search", "").strip()

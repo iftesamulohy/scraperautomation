@@ -1,25 +1,58 @@
-<div class="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50">
-  <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg w-full max-w-3xl max-h-[90vh] overflow-y-auto relative p-6">
-    <h2 class="text-xl font-bold text-center mb-4">📌 New Items (Last 24h)</h2>
+<div id="modal"
+     class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+  <div class="bg-white dark:bg-gray-800 rounded-lg p-6 max-w-lg w-full relative shadow-lg overflow-y-auto max-h-[90vh]">
 
-    <button onclick="document.getElementById('modal-container').innerHTML=''"
-            class="absolute top-2 right-3 text-2xl text-gray-700 dark:text-gray-300 hover:text-black dark:hover:text-white">
+    <!-- Close button -->
+    <button onclick="document.getElementById('modal-container').innerHTML='';"
+            class="absolute top-3 right-3 text-gray-600 hover:text-gray-900 dark:hover:text-white text-2xl font-bold leading-none">
       &times;
     </button>
 
-    {% if new_items %}
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        {% for item in new_items %}
-          <div class="bg-white dark:bg-gray-700 p-4 rounded shadow">
-            <img src="{{ item.image }}" alt="{{ item.name }}" class="w-full h-32 object-cover rounded mb-2">
-            <h3 class="font-semibold">{{ item.name }}</h3>
-            <p class="text-sm text-gray-500">{{ item.timestamp|date:"Y-m-d H:i" }}</p>
-            <a href="{{ item.details_link }}" target="_blank" class="text-blue-600 dark:text-blue-400 text-sm">Details</a>
-          </div>
-        {% endfor %}
+    <h2 class="text-xl font-bold mb-4">Detect Changes</h2>
+
+    <!-- Date/time filter form -->
+    <form
+      hx-get="{% url 'detect_changes' %}"
+      hx-target="#modal-container"
+      hx-swap="innerHTML"
+      class="mb-6 grid grid-cols-1 gap-4"
+    >
+      <div>
+        <label class="block text-sm font-medium mb-1">Start Date & Time</label>
+        <input type="datetime-local" name="start" class="w-full px-3 py-2 rounded border dark:bg-gray-700 dark:border-gray-600" value="{{ request.GET.start|default:'' }}">
       </div>
+      <div>
+        <label class="block text-sm font-medium mb-1">End Date & Time</label>
+        <input type="datetime-local" name="end" class="w-full px-3 py-2 rounded border dark:bg-gray-700 dark:border-gray-600" value="{{ request.GET.end|default:'' }}">
+      </div>
+      <button type="submit" class="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded w-full">Apply Filter</button>
+    </form>
+
+    <!-- Change results -->
+    <h3 class="text-lg font-semibold mb-2">Newly Added</h3>
+    {% if newly_added_items %}
+      <ul class="list-disc pl-5 mb-4 max-h-48 overflow-y-auto">
+        {% for item in newly_added_items %}
+          <li class="py-1">{{ item.name }}
+            <span class="ml-2 inline-block bg-green-500 text-white px-2 py-0.5 rounded text-xs">New</span>
+          </li>
+        {% endfor %}
+      </ul>
     {% else %}
-      <p class="text-center text-gray-500">No new items found in the last 24 hours.</p>
+      <p class="mb-4">No newly added items.</p>
+    {% endif %}
+
+    <h3 class="text-lg font-semibold mb-2">Omitted</h3>
+    {% if omitted_items %}
+      <ul class="list-disc pl-5 max-h-48 overflow-y-auto">
+        {% for item in omitted_items %}
+          <li class="py-1">{{ item.name }}
+            <span class="ml-2 inline-block bg-red-500 text-white px-2 py-0.5 rounded text-xs">Omitted</span>
+          </li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <p>No omitted items.</p>
     {% endif %}
   </div>
 </div>
