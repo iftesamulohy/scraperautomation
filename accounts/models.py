@@ -2,12 +2,23 @@ from django.db import models
 from solo.models import SingletonModel
 from datetime import time
 # Create your models here.
+import uuid
+from django.db import models
+
+class Token(models.Model):
+    uid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        # Example format: TOKEN_20250705_1530_<uuid>
+        return f"TOKEN_{self.created_at.strftime('%Y%m%d_%H%M')}_{self.uid.hex[:6]}"
 class ScrapedItem(models.Model):
     name = models.CharField(max_length=255)
     image = models.URLField()
     image_file = models.ImageField(upload_to='scraped_images/',null=True,blank=True)
     details_link = models.URLField()
     timestamp = models.DateTimeField(auto_now_add=True)
+    token = models.ForeignKey('Token', on_delete=models.CASCADE, related_name='items', null=True, blank=True)
 
     def __str__(self):
         return self.name

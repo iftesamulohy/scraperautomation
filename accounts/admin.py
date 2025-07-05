@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from accounts.models import ScrapedItem, ScraperSchedule
+from accounts.models import ScrapedItem, ScraperSchedule,Token
 from solo.admin import SingletonModelAdmin
 
 # Register your models here.
@@ -10,3 +10,4 @@ class ScrapedItemAdmin(admin.ModelAdmin):
     search_fields = ('name',)
     ordering = ('-timestamp',)
 admin.site.register(ScraperSchedule, SingletonModelAdmin)
+admin.site.register(Token)

@@ -5,9 +5,10 @@ from urllib.parse import urljoin
 import os
 import mimetypes
 
-from accounts.models import ScrapedItem
+from accounts.models import ScrapedItem,Token
 
 def scrape_fbi_seeking_info():
+    token = Token.objects.create()
     base_url = (
         "https://www.fbi.gov/wanted/seeking-info/@@castle.cms.querylisting/querylisting-1"
         "?display_type=wanted-grid"
