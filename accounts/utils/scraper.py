@@ -1,5 +1,10 @@
 import cloudscraper
 from bs4 import BeautifulSoup
+from django.core.files.base import ContentFile
+from urllib.parse import urljoin
+import os
+import mimetypes
+
 from accounts.models import ScrapedItem
 
 def scrape_fbi_seeking_info():
@@ -50,15 +55,31 @@ def scrape_fbi_seeking_info():
             img_tag = item.find("img")
             image = img_tag.get("src") or img_tag.get("data-src") or "" if img_tag else ""
 
-            print(f"✔ {name}")
+            if image and image.startswith("/"):
+                image = urljoin("https://www.fbi.gov", image)
 
             if name and link and image:
-                ScrapedItem.objects.create(
-                    name=name,
-                    details_link=link,
-                    image=image
-                )
-                total += 1
+                # Download image
+                img_response = scraper.get(image)
+                if img_response.status_code == 200:
+                    # Determine the proper file extension
+                    content_type, _ = mimetypes.guess_type(image)
+                    if content_type:
+                        extension = content_type.split("/")[1]
+                    else:
+                        extension = 'jpg'  # default to jpg if no extension found
+
+                    image_name = os.path.basename(image.split("?")[0])  # clean image name
+                    image_name_with_extension = f"{os.path.splitext(image_name)[0]}.{extension}"
+
+                    scraped_item = ScrapedItem(
+                        name=name,
+                        details_link=link,
+                        image=image
+                    )
+                    scraped_item.image_file.save(image_name_with_extension, ContentFile(img_response.content), save=True)
+                    print(f"✔ Saved: {name}")
+                    total += 1
 
         page += 1
 

@@ -5,6 +5,7 @@ from datetime import time
 class ScrapedItem(models.Model):
     name = models.CharField(max_length=255)
     image = models.URLField()
+    image_file = models.ImageField(upload_to='scraped_images/',null=True,blank=True)
     details_link = models.URLField()
     timestamp = models.DateTimeField(auto_now_add=True)
 
