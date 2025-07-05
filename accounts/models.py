@@ -11,7 +11,7 @@ class Token(models.Model):
 
     def __str__(self):
         # Example format: TOKEN_20250705_1530_<uuid>
-        return f"TOKEN_{self.created_at.strftime('%Y%m%d_%H%M')}_{self.uid.hex[:6]}"
+        return f"Token created on {self.created_at.strftime('%B %d, %Y at %I:%M %p')} - {self.uid.hex[:6]}"
 class ScrapedItem(models.Model):
     name = models.CharField(max_length=255)
     image = models.URLField()

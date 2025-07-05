@@ -6,7 +6,7 @@ from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
-from accounts.models import ScrapedItem
+from accounts.models import ScrapedItem, Token
 from accounts.utils.scraper import scrape_fbi_seeking_info  # updated import
 
 from django.utils.dateparse import parse_date
@@ -22,44 +22,64 @@ class DetectChangesView(View):
     def get(self, request):
         now = timezone_now()
 
-        # Get optional datetime strings from request
-        start_str = request.GET.get('start')
-        end_str = request.GET.get('end')
+        token1_id = request.GET.get("token1")
+        token2_id = request.GET.get("token2")
 
-        # Fallback defaults: today and yesterday
-        today_start = now.replace(hour=0, minute=0, second=0, microsecond=0)
-        start_time = parse_datetime(start_str) if start_str else today_start
-        end_time = parse_datetime(end_str) if end_str else now
+        if token1_id and token2_id:
+            try:
+                token1 = Token.objects.get(pk=token1_id)
+                token2 = Token.objects.get(pk=token2_id)
+            except Token.DoesNotExist:
+                return HttpResponse("Invalid tokens selected.", status=400)
 
-        # Ensure timezone-aware
-        if is_naive(start_time):
-            start_time = make_aware(start_time)
-        if is_naive(end_time):
-            end_time = make_aware(end_time)
+            items1 = ScrapedItem.objects.filter(token=token1)
+            items2 = ScrapedItem.objects.filter(token=token2)
 
-        # Calculate "previous range" of same duration
-        duration = end_time - start_time
-        prev_start = start_time - duration
-        prev_end = start_time
+            names1 = set(items1.values_list("name", flat=True))
+            names2 = set(items2.values_list("name", flat=True))
 
-        # Query previous and current range
-        prev_items = ScrapedItem.objects.filter(timestamp__gte=prev_start, timestamp__lt=prev_end)
-        current_items = ScrapedItem.objects.filter(timestamp__gte=start_time, timestamp__lte=end_time)
+            newly_added_names = names2 - names1
+            omitted_names = names1 - names2
 
-        prev_names = set(prev_items.values_list('name', flat=True))
-        current_names = set(current_items.values_list('name', flat=True))
+            newly_added_items = items2.filter(name__in=newly_added_names)
+            omitted_items = items1.filter(name__in=omitted_names)
 
-        # Detect changes
-        newly_added_names = current_names - prev_names
-        omitted_names = prev_names - current_names
+        else:
+            # fallback to default datetime-based comparison
+            start_str = request.GET.get('start')
+            end_str = request.GET.get('end')
 
-        newly_added_items = current_items.filter(name__in=newly_added_names)
-        omitted_items = prev_items.filter(name__in=omitted_names)
+            today_start = now.replace(hour=0, minute=0, second=0, microsecond=0)
+            start_time = parse_datetime(start_str) if start_str else today_start
+            end_time = parse_datetime(end_str) if end_str else now
 
-        # Render modal
+            if is_naive(start_time):
+                start_time = make_aware(start_time)
+            if is_naive(end_time):
+                end_time = make_aware(end_time)
+
+            duration = end_time - start_time
+            prev_start = start_time - duration
+            prev_end = start_time
+
+            prev_items = ScrapedItem.objects.filter(timestamp__gte=prev_start, timestamp__lt=prev_end)
+            current_items = ScrapedItem.objects.filter(timestamp__gte=start_time, timestamp__lte=end_time)
+
+            prev_names = set(prev_items.values_list('name', flat=True))
+            current_names = set(current_items.values_list('name', flat=True))
+
+            newly_added_names = current_names - prev_names
+            omitted_names = prev_names - current_names
+
+            newly_added_items = current_items.filter(name__in=newly_added_names)
+            omitted_items = prev_items.filter(name__in=omitted_names)
+
         html = render_to_string("accounts/partials/detect_changes_modal.html", {
             "newly_added_items": newly_added_items,
             "omitted_items": omitted_items,
+            "tokens": Token.objects.order_by("-created_at")[:20],  # for dropdown
+            "selected_token1": token1_id,
+            "selected_token2": token2_id,
             "checked_at": now,
         }, request=request)
 

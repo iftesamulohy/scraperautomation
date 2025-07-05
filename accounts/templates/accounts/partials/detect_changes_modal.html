@@ -10,7 +10,7 @@
 
     <h2 class="text-xl font-bold mb-4">Detect Changes</h2>
 
-    <!-- Date/time filter form -->
+    <!-- Token filter form -->
     <form
       hx-get="{% url 'detect_changes' %}"
       hx-target="#modal-container"
@@ -18,14 +18,32 @@
       class="mb-6 grid grid-cols-1 gap-4"
     >
       <div>
-        <label class="block text-sm font-medium mb-1">Start Date & Time</label>
-        <input type="datetime-local" name="start" class="w-full px-3 py-2 rounded border dark:bg-gray-700 dark:border-gray-600" value="{{ request.GET.start|default:'' }}">
+        <label class="block text-sm font-medium mb-1">Previous Token</label>
+        <select name="token1" class="w-full px-3 py-2 rounded border dark:bg-gray-700 dark:border-gray-600">
+          <option value="">-- Previous Token --</option>
+          {% for token in tokens %}
+            <option value="{{ token.id }}" {% if token.id|stringformat:"s" == selected_token1 %}selected{% endif %}>
+              {{ token }}
+            </option>
+          {% endfor %}
+        </select>
       </div>
+
       <div>
-        <label class="block text-sm font-medium mb-1">End Date & Time</label>
-        <input type="datetime-local" name="end" class="w-full px-3 py-2 rounded border dark:bg-gray-700 dark:border-gray-600" value="{{ request.GET.end|default:'' }}">
+        <label class="block text-sm font-medium mb-1">Latest Token</label>
+        <select name="token2" class="w-full px-3 py-2 rounded border dark:bg-gray-700 dark:border-gray-600">
+          <option value="">-- Latest Token --</option>
+          {% for token in tokens %}
+            <option value="{{ token.id }}" {% if token.id|stringformat:"s" == selected_token2 %}selected{% endif %}>
+              {{ token }}
+            </option>
+          {% endfor %}
+        </select>
       </div>
-      <button type="submit" class="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded w-full">Apply Filter</button>
+
+      <button type="submit" class="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded w-full">
+        Apply Token Filter
+      </button>
     </form>
 
     <!-- Change results -->

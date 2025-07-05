@@ -76,7 +76,9 @@ def scrape_fbi_seeking_info():
                     scraped_item = ScrapedItem(
                         name=name,
                         details_link=link,
-                        image=image
+                        image=image,
+                        token = token
+
                     )
                     scraped_item.image_file.save(image_name_with_extension, ContentFile(img_response.content), save=True)
                     print(f"✔ Saved: {name}")
