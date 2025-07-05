@@ -1,5 +1,6 @@
 from django.db import models
 from solo.models import SingletonModel
+from datetime import time
 # Create your models here.
 class ScrapedItem(models.Model):
     name = models.CharField(max_length=255)
@@ -19,8 +20,15 @@ class ScraperSchedule(SingletonModel):
         ('monthly', 'Monthly'),
     ]
 
-    interval = models.CharField(max_length=10, choices=INTERVAL_CHOICES, default='daily')
-    run_time = models.TimeField(help_text="Time of day to run the task")
+    interval = models.CharField(
+        max_length=10,
+        choices=INTERVAL_CHOICES,
+        default='daily'
+    )
+    run_time = models.TimeField(
+        help_text="Time of day to run the task",
+        default=time(0, 0)  # Default: midnight (00:00)
+    )
 
     def __str__(self):
         return "Scraper Schedule Settings"
