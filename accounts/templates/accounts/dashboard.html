@@ -28,7 +28,6 @@
       document.documentElement.classList.toggle('dark', savedTheme === 'dark');
       updateThemeIcon();
 
-      // Default today
       const today = new Date().toISOString().split('T')[0];
       document.getElementById('start_date').value = today;
       document.getElementById('end_date').value = today;
@@ -62,6 +61,18 @@
 
     <h1 class="text-3xl font-bold mb-6">Welcome, {{ request.user.username }}!</h1>
 
+    <!-- Detect Changes Button -->
+    <div class="mb-4">
+      <button
+        hx-get="{% url 'detect_changes' %}"
+        hx-target="#modal-container"
+        hx-trigger="click"
+        hx-swap="innerHTML"
+        class="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded">
+        Detect Changes
+      </button>
+    </div>
+
     <!-- Filter Form -->
     <form id="search-form"
           hx-get="{% url 'scraped_items_list' %}"
@@ -86,7 +97,7 @@
       <label class="inline-flex items-center space-x-2">
         <input type="checkbox" name="show_duplicates" class="rounded" checked />
         <span>Show duplicate data</span>
-    </label>
+      </label>
     </form>
 
     <!-- Results Grid -->
@@ -97,6 +108,9 @@
          hx-target="this"
          hx-swap="innerHTML">
     </div>
+
+    <!-- Modal Container for Detect Changes -->
+    <div id="modal-container"></div>
 
   </main>
 </body>
