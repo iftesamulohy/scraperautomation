@@ -144,9 +144,9 @@ USE_TZ = True
 
 # Email Config
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp-relay.brevo.com'  # e.g. smtp.gmail.com
+EMAIL_HOST = 'sandbox.smtp.mailtrap.io'  # e.g. smtp.gmail.com
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-EMAIL_HOST_USER = '915baa001@smtp-brevo.com'
-EMAIL_HOST_PASSWORD = '2JOUs3S4Z8xp0En5'
-DEFAULT_FROM_EMAIL = 'your@email.com'
+EMAIL_HOST_USER = 'fdf97858fc9a93'
+EMAIL_HOST_PASSWORD = 'cb639fb486c704'
+# DEFAULT_FROM_EMAIL = 'iftesamulohy@gmail.com'
