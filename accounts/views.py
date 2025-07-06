@@ -18,6 +18,10 @@ from django.utils import timezone
 from django.db.models import Max, Q
 from django.utils.timezone import make_aware, is_naive, now as timezone_now
 from django.utils.dateparse import parse_datetime
+from django.core.mail import send_mail
+from django.conf import settings
+
+from utils.email_async import send_email_async
 class DetectChangesView(View):
     def get(self, request):
         now = timezone_now()
@@ -45,7 +49,6 @@ class DetectChangesView(View):
             omitted_items = items1.filter(name__in=omitted_names)
 
         else:
-            # fallback to default datetime-based comparison
             start_str = request.GET.get('start')
             end_str = request.GET.get('end')
 
@@ -74,15 +77,31 @@ class DetectChangesView(View):
             newly_added_items = current_items.filter(name__in=newly_added_names)
             omitted_items = prev_items.filter(name__in=omitted_names)
 
-        html = render_to_string("accounts/partials/detect_changes_modal.html", {
+        context = {
             "newly_added_items": newly_added_items,
             "omitted_items": omitted_items,
-            "tokens": Token.objects.order_by("-created_at")[:20],  # for dropdown
+            "tokens": Token.objects.order_by("-created_at")[:20],
             "selected_token1": token1_id,
             "selected_token2": token2_id,
             "checked_at": now,
-        }, request=request)
+        }
 
+        # ✅ Send email in background only if changes exist
+        try:
+            if newly_added_items.exists() or omitted_items.exists():
+                user_email = request.user.email
+                subject = "Changes Detected in Scraped Data"
+                message = (
+                    f"✅ Changes detected at {now.strftime('%Y-%m-%d %H:%M')}\n\n"
+                    f"🟢 Newly Added Items: {newly_added_items.count()}\n"
+                    f"🔴 Omitted Items: {omitted_items.count()}\n\n"
+                    "Visit your dashboard to view the details."
+                )
+                send_email_async(subject, message, [user_email])
+        except:
+            pass
+
+        html = render_to_string("accounts/partials/detect_changes_modal.html", context, request=request)
         return HttpResponse(html)
 class ScrapedItemsListView(View):
     def get(self, request):
