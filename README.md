@@ -19,6 +19,7 @@
 
 - [🎬 Project Demo](#-project-demo)
 - [📌 Project Overview](#-project-overview)
+- [🖼️ Feature Screenshots](#️-feature-screenshots)
 - [✨ Features](#-features)
 - [🚀 Deploy on Your Local Machine](#-deploy-on-your-local-machine)
 - [☁️ Deploy on AWS EC2 with Gunicorn and Nginx](#️-deploy-on-aws-ec2-with-gunicorn-and-nginx)
@@ -37,6 +38,23 @@
 ## 📌 Project Overview
 
 This is a web scraping automation project designed to efficiently collect and process data from specific online sources. The scraper is built with robustness and scalability in mind, using modern Python libraries and Django integration to store and manage the collected data. The system also includes support for image downloading, file storage, duplicate detection, and scheduled scraping.
+
+---
+
+## 🖼️ Feature Screenshots
+
+### 🔐 User Authentication System
+
+<div align="center">
+  <img src="public/images/login.jpeg" alt="Login Interface" width="600" />
+  <p><em>Secure login interface with modern dark theme design</em></p>
+</div>
+
+The application features a clean and intuitive login system that provides:
+- **Secure Authentication** - Username and password-based login
+- **Modern UI Design** - Dark theme with professional styling
+- **Responsive Layout** - Optimized for all device sizes
+- **User-Friendly Interface** - Simple and straightforward login process
 
 ---
 
