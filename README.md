@@ -56,6 +56,38 @@ The application features a clean and intuitive login system that provides:
 - **Responsive Layout** - Optimized for all device sizes
 - **User-Friendly Interface** - Simple and straightforward login process
 
+### 📊 Interactive Dashboard with Infinite Scroll
+
+<div align="center">
+  <img src="public/infinite_scrollable_dashboard.jpeg" alt="Dashboard Interface" width="600" />
+  <p><em>Comprehensive dashboard with infinite scrolling and advanced filtering capabilities</em></p>
+</div>
+
+The dashboard provides powerful data management and visualization features:
+- **Infinite Scrolling** - Seamless browsing through large datasets without pagination
+- **Advanced Search & Filtering** - Search by name and filter by tokens with real-time results
+- **Duplicate Data Detection** - Toggle to show/hide duplicate entries for data quality control
+- **Action Controls** - Quick access to detect changes, run scraper, and logout functionality
+- **Visual Data Display** - Grid-based layout showing scraped images and data in an organized manner
+- **Responsive Design** - Optimized interface that works across all device sizes
+- **Dark Theme Consistency** - Maintains the modern dark aesthetic throughout the application
+
+### ⚡ Automated Scraper Execution
+
+<div align="center">
+  <img src="public/run_scraper.jpeg" alt="Run Scraper Interface" width="600" />
+  <p><em>Real-time scraper execution with highlighted action controls and status indicators</em></p>
+</div>
+
+The scraper execution interface demonstrates the core automation functionality:
+- **One-Click Execution** - Highlighted "Run Scraper" button for immediate scraping operations
+- **Real-Time Processing** - Live execution of scraping tasks with visual feedback
+- **Action Prioritization** - Clear visual emphasis on the primary scraper control
+- **Integrated Workflow** - Seamless integration with dashboard controls and data management
+- **Status Monitoring** - Visual indicators showing scraper activity and execution state
+- **User Control** - Easy access to start, monitor, and manage scraping operations
+- **Professional Interface** - Consistent design language with intuitive user experience
+
 ---
 
 ## ✨ Features
