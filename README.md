@@ -1,5 +1,10 @@
 # 🕷️ Web Scraping Automation Project
 
+## 📚 Table of Contents
+
+- [Deploy on Your Local Machine](#-deploy-on-your-local-machine)
+
+
 [![Click to Watch the Project Overview on YouTube](https://img.youtube.com/vi/ppg-4cH4cac/0.jpg)](https://www.youtube.com/watch?v=ppg-4cH4cac)
 
 🎬 **Watch the video overview**: [Click here to see how the project works in action »](https://www.youtube.com/watch?v=ppg-4cH4cac)
@@ -86,13 +91,3 @@ Now open your browser and visit:
 GitHub Repo: [https://github.com/iftesamulohy/scraperautomation](https://github.com/iftesamulohy/scraperautomation)
 
 ---
-
-## 📃 License
-
-This project is open-source and available under the [MIT License](LICENSE).
-
----
-
-## 🤝 Contributions
-
-Contributions, issues, and feature requests are welcome! Feel free to open a pull request or contact the maintainer.
