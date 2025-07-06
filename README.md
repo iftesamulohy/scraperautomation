@@ -88,6 +88,96 @@ The scraper execution interface demonstrates the core automation functionality:
 - **User Control** - Easy access to start, monitor, and manage scraping operations
 - **Professional Interface** - Consistent design language with intuitive user experience
 
+### 🎯 Token-Based Data Filtering
+
+<div align="center">
+  <img src="public/tokenbase_data_filtering.jpeg" alt="Token-Based Filtering Interface" width="600" />
+  <p><em>Advanced token-based filtering system with detailed metadata and timestamp tracking</em></p>
+</div>
+
+The token-based filtering system provides sophisticated data management capabilities:
+- **Token Selection** - Dropdown interface showing specific token details with creation timestamps
+- **Metadata Display** - Comprehensive token information including creation date, time, and unique identifiers
+- **Precision Filtering** - Filter data by specific tokens (e.g., "Token created on July 06, 2025 at 08:12 AM - 242f83")
+- **Search Integration** - Combined token filtering with name-based search functionality
+- **Data Quality Control** - Duplicate data toggle for maintaining clean datasets
+- **Timestamp Tracking** - Detailed temporal information for audit trails and data lineage
+- **Professional Interface** - Consistent dark theme with clear visual hierarchy and intuitive controls
+
+### 🔍 Smart Search Functionality
+
+<div align="center">
+  <img src="public/search_by_name.jpeg" alt="Smart Search Interface" width="600" />
+  <p><em>Intelligent search system with real-time filtering and highlighted results</em></p>
+</div>
+
+The smart search functionality delivers powerful data discovery capabilities:
+- **Real-Time Search** - Instant filtering as you type with highlighted search terms
+- **Intelligent Matching** - Advanced search algorithm that finds relevant results (e.g., searching "alexan" matches "Alexander", "Alexandra", "Tammy Jo Alexander")
+- **Visual Result Highlighting** - Clear visual emphasis on search input with red border highlighting
+- **Comprehensive Results** - Displays matching records with full profile information and timestamps
+- **Search Integration** - Seamlessly works with token filtering and duplicate data controls
+- **Performance Optimized** - Fast search response even with large datasets
+- **User Experience** - Intuitive search interface with immediate visual feedback
+- **Data Context** - Shows complete record details including scraping timestamps and profile images
+
+### 🔄 Advanced Change Detection System
+
+<div align="center">
+  <img src="public/detect_changes_by_token.jpeg" alt="Change Detection Interface" width="600" />
+  <p><em>Sophisticated change detection modal with token comparison and differential analysis</em></p>
+</div>
+
+The change detection system provides comprehensive data monitoring and comparison capabilities:
+- **Token Comparison** - Compare data between different scraping sessions using specific tokens
+- **Previous vs Latest Analysis** - Side-by-side comparison of historical and current data states
+- **Newly Added Detection** - Automatically identifies and highlights new entries with green "New" badges
+- **Omitted Items Tracking** - Monitors and reports items that were removed or no longer available
+- **Modal Interface** - Clean, focused modal design for detailed change analysis
+- **Token Selection** - Dropdown menus for selecting specific tokens to compare (e.g., "242f83" vs "b421b1")
+- **Apply Filter Integration** - Seamless integration with main dashboard filtering system
+- **Data Integrity Monitoring** - Ensures data consistency and tracks changes over time
+- **Professional UI** - Consistent dark theme with clear visual hierarchy and intuitive controls
+
+### ⏰ Automated Scraper Scheduler
+
+<div align="center">
+  <img src="public/auto_scraper_scheduler.jpeg" alt="Scraper Scheduler Interface" width="600" />
+  <p><em>Comprehensive scheduling system with flexible interval configuration and automated execution</em></p>
+</div>
+
+The automated scheduler provides enterprise-level task automation capabilities:
+- **Flexible Scheduling Intervals** - Configure scraping frequency with multiple options (Hourly, Daily, Weekly, Monthly)
+- **Custom Run Time Configuration** - Set specific execution times with precise scheduling controls
+- **Dropdown Selection Interface** - User-friendly dropdown menus for easy interval selection
+- **Save and Continue Editing** - Multiple save options for workflow flexibility and iterative configuration
+- **History Tracking** - Built-in history functionality to monitor past scheduled executions
+- **Breadcrumb Navigation** - Clear navigation path showing Home → Accounts → Scraper schedule
+- **Form Validation** - Required field indicators (*) ensuring proper configuration
+- **Professional Interface** - Clean, light-themed design with intuitive form controls
+- **Automated Execution** - Set-and-forget automation for consistent data collection
+- **Enterprise Features** - Production-ready scheduling with robust error handling and monitoring
+
+### 📧 Intelligent Email Notification System
+
+<div align="center">
+  <img src="public/email_for_changes.jpeg" alt="Email Notification System" width="600" />
+  <p><em>Professional email notification system with detailed change reports and dashboard integration</em></p>
+</div>
+
+The email notification system provides comprehensive automated alerting capabilities:
+- **Automated Change Alerts** - Instant email notifications when changes are detected in scraped data
+- **Professional Email Interface** - Integration with Mailtrap for reliable email delivery and testing
+- **Detailed Change Reports** - Comprehensive email content showing specific changes with timestamps
+- **Real-Time Statistics** - Email displays newly added items count and omitted items tracking
+- **Dashboard Integration** - Direct links to view detailed changes in the main dashboard
+- **Email History Tracking** - Complete inbox management with timestamped notification history
+- **Multi-Format Support** - HTML, Text, Raw, and Spam Analysis views for comprehensive email handling
+- **Production Email Service** - Enterprise-grade email delivery with 1/200 daily email limits
+- **Sandbox Environment** - Safe testing environment for email notifications during development
+- **User Account Management** - Personalized email notifications sent to specific user accounts
+- **Technical Information** - Detailed email headers and technical analysis for debugging and monitoring
+
 ---
 
 ## ✨ Features
