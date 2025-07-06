@@ -46,7 +46,7 @@ This is a web scraping automation project designed to efficiently collect and pr
 ### 🔐 User Authentication System
 
 <div align="center">
-  <img src="public/images/login.jpeg" alt="Login Interface" width="600" />
+  <img src="public/login.jpeg" alt="Login Interface" width="600" />
   <p><em>Secure login interface with modern dark theme design</em></p>
 </div>
 
