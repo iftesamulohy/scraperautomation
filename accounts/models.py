@@ -4,14 +4,14 @@ from datetime import time
 # Create your models here.
 import uuid
 from django.db import models
-
+from django.utils import timezone
 class Token(models.Model):
     uid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        # Example format: TOKEN_20250705_1530_<uuid>
-        return f"Token created on {self.created_at.strftime('%B %d, %Y at %I:%M %p')} - {self.uid.hex[:6]}"
+        local_time = timezone.localtime(self.created_at)
+        return f"Token created on {local_time.strftime('%B %d, %Y at %I:%M %p')} - {self.uid.hex[:6]}"
 class ScrapedItem(models.Model):
     name = models.CharField(max_length=255)
     image = models.URLField()
