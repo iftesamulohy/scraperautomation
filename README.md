@@ -1,6 +1,10 @@
 # 🕷️ Web Scraping Automation Project
 
-[![Watch the Video](https://img.youtube.com/vi/ppg-4cH4cac/0.jpg)](https://www.youtube.com/watch?v=ppg-4cH4cac)
+[![Click to Watch the Project Overview on YouTube](https://img.youtube.com/vi/ppg-4cH4cac/0.jpg)](https://www.youtube.com/watch?v=ppg-4cH4cac)
+
+🎬 **Watch the video overview**: [Click here to see how the project works in action »](https://www.youtube.com/watch?v=ppg-4cH4cac)
+
+---
 
 ## 📌 Project Overview
 
