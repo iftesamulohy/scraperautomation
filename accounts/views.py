@@ -138,7 +138,7 @@ class ScrapedItemsListView(View):
 
         html = render_to_string(
             "accounts/partials/scraped_items_list.html",
-            {"items": paginated_items, "page": page}
+            {"items": paginated_items, "page": page,"total_count": len(qs)}
         )
         return HttpResponse(html)
 class RunScraperView(LoginRequiredMixin, View):
